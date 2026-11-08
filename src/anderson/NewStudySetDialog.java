@@ -37,7 +37,9 @@ public class NewStudySetDialog extends javax.swing.JDialog {
         initComponents();
         addMoreComponents();
         setLocationRelativeTo(null);
+        this.setTitle("Create A New Study Set");
         this.sets = sets;
+        addButton.setText("Add");
     }
     
     public StudySet getSet() {
@@ -80,7 +82,7 @@ public class NewStudySetDialog extends javax.swing.JDialog {
         setResizable(false);
 
         addButton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        addButton.setLabel("Add");
+        addButton.setToolTipText("");
         addButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addButtonActionPerformed(evt);
@@ -88,8 +90,8 @@ public class NewStudySetDialog extends javax.swing.JDialog {
         });
 
         submitButton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        submitButton.setText("Create");
         submitButton.setEnabled(false);
-        submitButton.setLabel("Submit");
         submitButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 submitButtonActionPerformed(evt);

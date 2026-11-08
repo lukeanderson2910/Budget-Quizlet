@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,11 +42,14 @@ public class BudgetQuizlet extends javax.swing.JFrame {
         this.setIconImage(new ImageIcon(getClass().getResource("/anderson/logo.png")).getImage());
         this.setTitle("Budget Quizlet");
         setLocationRelativeTo(null);
-        String path = System.getProperty("user.dir") + File.separator + "Study Sets" + File.separator + "StudySets.set";
-        File savedSets = new File(path);
-        if (savedSets.exists()) {
-            load();
-        }
+        try {
+            String folderPath = BudgetQuizlet.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+            folderPath = folderPath.substring(0, folderPath.length() - 18);
+            File savedSets = new File(folderPath + File.separator + "StudySets.set");
+            if (savedSets.exists()) {
+                load(savedSets);
+            }
+        } catch (URISyntaxException ignored) {}
         String fileName = "savedTheme.thm";
         File theme = new File(System.getProperty("user.dir") + File.separator + fileName);
         if (theme.exists()) {
@@ -474,9 +478,7 @@ public class BudgetQuizlet extends javax.swing.JFrame {
         currentSetLabel.setText("Current Set: " + name);
     }
 
-    public void load() {
-        String path = System.getProperty("user.dir") + File.separator + "Study Sets" + File.separator + "StudySets.set";
-        File savedSets = new File(path);
+    public void load(File savedSets) {
         try {
             ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(savedSets));
             studySets = (ArrayList<StudySet>) inputStream.readObject();
@@ -494,23 +496,22 @@ public class BudgetQuizlet extends javax.swing.JFrame {
     }
 
     public void save(boolean showDialog) {
-        String folderPath = System.getProperty("user.dir") + File.separator + "Study Sets";
-        File folder = new File(folderPath);
-        folder.mkdir();
-        File studySet = new File(folderPath + File.separator + "StudySets.set");
         try {
-            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(studySet));
-            outputStream.writeObject(studySets);
-            outputStream.close();
+            String folderPath = BudgetQuizlet.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+            folderPath = folderPath.substring(0, folderPath.length() - 18);
+            File studySet = new File(folderPath + File.separator + "StudySets.set");
+            System.out.println(studySet.getAbsolutePath());
+            try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(studySet))) {
+                outputStream.writeObject(studySets);
+            }
             if (showDialog) {
                 JOptionPane.showMessageDialog(this, "Successfully saved study sets!", "Saved!", JOptionPane.INFORMATION_MESSAGE);
             }
 
-        } catch (IOException ex) {
+        } catch (IOException | URISyntaxException ex) {
             if (showDialog) {
-                JOptionPane.showMessageDialog(this, "Error saving study sets", "Save error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Error saving study sets: " + ex.getMessage(), "Save error", JOptionPane.ERROR_MESSAGE);
             }
-
         }
     }
 
